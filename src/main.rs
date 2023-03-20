@@ -1,6 +1,3 @@
-mod optional;
-
-use optional::wait_untill_unix;
 use std::env;
 use std::str::FromStr;
 use std::sync::{Arc, Mutex};
@@ -11,8 +8,19 @@ use std::time::Duration;
 use secp256k1::SecretKey;
 use web3::contract::{Contract, tokens::Tokenize};
 use web3::{Web3, transports::WebSocket};
-use web3::types::{Address, Bytes, TransactionParameters, H160, U256, SignedTransaction};
-
+use web3::types::{Address, Bytes, TransactionParameters, H160, U256, U64, SignedTransaction};
+pub async fn wait_for_block(web3s: Web3<WebSocket>) {
+    let needed_block = U64::from(16890400);
+    loop {
+        let curr_block = web3s.eth().block_number().await.unwrap();
+        if needed_block != curr_block {
+            println!("Claim not started yet");
+        } else {
+            println!("Claim started");
+            break;
+        }
+    }
+}
 #[tokio::main]
 async fn main() -> web3::Result<()> {
 
